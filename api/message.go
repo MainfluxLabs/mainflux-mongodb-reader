@@ -10,6 +10,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -17,8 +18,8 @@ import (
 	"time"
 
 	"github.com/go-zoo/bone"
-	"github.com/mainflux/mainflux-core/models"
 	"github.com/mainflux/mainflux-mongodb-reader/db"
+	"github.com/mainflux/mainflux-mongodb-reader/models"
 	"gopkg.in/mgo.v2/bson"
 )
 

@@ -15,8 +15,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mainflux/mainflux-core/api"
-	mfdb "github.com/mainflux/mainflux-core/db"
+	"github.com/mainflux/mainflux-mongodb-reader/api"
+	mfdb "github.com/mainflux/mainflux-mongodb-reader/db"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/ory-am/dockertest.v3"

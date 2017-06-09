@@ -12,11 +12,14 @@ import (
 	"flag"
 	"fmt"
 	"github.com/fatih/color"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/mainflux/mainflux-mongodb-reader/api"
 	"github.com/mainflux/mainflux-mongodb-reader/db"
+
+	"github.com/cenkalti/backoff"
 )
 
 const (
@@ -44,9 +47,19 @@ type (
 	}
 )
 
-func main() {
-	opts := Opts{}
+var (
+	opts Opts
+)
 
+func tryMongoInit() error {
+	var err error
+
+	log.Print("Connecting to MongoDB... ")
+	err = db.InitMongo(opts.MongoHost, opts.MongoPort, opts.MongoDatabase)
+	return err
+}
+
+func main() {
 	flag.StringVar(&opts.HTTPHost, "a", "localhost", "HTTP server address.")
 	flag.StringVar(&opts.HTTPPort, "p", "7071", "HTTP server port.")
 	flag.StringVar(&opts.MongoHost, "m", "localhost", "MongoDB host.")
@@ -63,7 +76,12 @@ func main() {
 	}
 
 	// MongoDb
-	db.InitMongo(opts.MongoHost, opts.MongoPort, opts.MongoDatabase)
+	// Connect to MongoDB
+	if err := backoff.Retry(tryMongoInit, backoff.NewExponentialBackOff()); err != nil {
+		log.Fatalf("MongoDd: Can't connect: %v\n", err)
+	} else {
+		log.Println("OK")
+	}
 
 	// Print banner
 	color.Cyan(banner)
@@ -74,9 +92,7 @@ func main() {
 }
 
 var banner = `
-┌┬┐┌─┐┬┌┐┌┌─┐┬  ┬ ┬─┐ ┬   ┬ ┬┌┬┐┌┬┐┌─┐
-│││├─┤││││├┤ │  │ │┌┴┬┘───├─┤ │  │ ├─┘
-┴ ┴┴ ┴┴┘└┘└  ┴─┘└─┘┴ └─   ┴ ┴ ┴  ┴ ┴  
+       MAINFLUX Mongo Reader 
                                       
     == Industrial IoT System ==
 
